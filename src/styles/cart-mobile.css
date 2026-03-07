@@ -1,0 +1,111 @@
+/* Optimisation du panier pour mobile */
+
+@media (max-width: 640px) {
+
+    /* Réorganiser les items du panier en layout vertical sur mobile */
+    .cart-item-container {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0.75rem !important;
+        padding: 1rem !important;
+    }
+
+    /* Section image + nom + bouton supprimer */
+    .cart-item-header {
+        display: flex !important;
+        align-items: flex-start !important;
+        gap: 0.75rem !important;
+    }
+
+    .cart-item-image {
+        width: 5rem !important;
+        /* 80px */
+        height: 5rem !important;
+        /* 80px */
+        flex-shrink: 0 !important;
+    }
+
+    .cart-item-details {
+        flex: 1 !important;
+        min-width: 0 !important;
+    }
+
+    .cart-item-name {
+        font-size: 1rem !important;
+        line-height: 1.25rem !important;
+        display: -webkit-box !important;
+        -webkit-line-clamp: 2 !important;
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+    }
+
+    .cart-item-price {
+        font-size: 0.875rem !important;
+        margin-top: 0.25rem !important;
+    }
+
+    /* Section quantité + total */
+    .cart-item-footer {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+    }
+
+    /* Boutons de quantité plus petits sur mobile */
+    .cart-quantity-btn {
+        padding: 0.375rem 0.625rem !important;
+    }
+
+    .cart-quantity-btn svg {
+        width: 16px !important;
+        height: 16px !important;
+    }
+
+    .cart-quantity-value {
+        padding: 0.375rem 0.75rem !important;
+        font-size: 0.875rem !important;
+    }
+
+    /* Total plus petit sur mobile */
+    .cart-item-total {
+        font-size: 1rem !important;
+    }
+
+    /* Bouton supprimer plus petit */
+    .cart-remove-btn {
+        padding: 0.25rem !important;
+    }
+
+    .cart-remove-btn svg {
+        width: 18px !important;
+        height: 18px !important;
+    }
+
+    /* Réduire les marges inutiles */
+    .cart-item-container:first-child {
+        margin-top: 0 !important;
+    }
+
+    .cart-item-container {
+        margin-top: 0 !important;
+        margin-bottom: 0 !important;
+    }
+}
+
+/* Pour les très petits écrans */
+@media (max-width: 375px) {
+    .cart-item-image {
+        width: 4.5rem !important;
+        /* 72px */
+        height: 4.5rem !important;
+        /* 72px */
+    }
+
+    .cart-item-name {
+        font-size: 0.9375rem !important;
+    }
+
+    .cart-item-price {
+        font-size: 0.8125rem !important;
+    }
+}

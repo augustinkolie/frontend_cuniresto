@@ -1,0 +1,96 @@
+*{
+    font-family: "Lato",sans-serif;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+body{
+    background: transparent;
+    position: relative;
+}
+.title-commentaire{
+    display: flex;
+    justify-content: center;
+    font-style: italic;
+    position: absolute;
+    position: fixed;
+    position: sticky;
+    top: 0;
+    padding: 10px;
+    color: white;
+    background-color: rgba(20, 20, 243, 0.786);
+}
+.contenu{
+    display: flex;
+    flex-direction: column;
+    width: 60%;
+    margin: 0 auto;
+    border: 1px solid #eee;
+    padding: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 8px black;
+}
+.contenu .profile{
+    margin-bottom: 10px;
+}
+.contenu .profile h4,p{
+    font-style: italic;
+}
+.contenu .profile h4{
+    margin-bottom: 10px;
+}
+.commentaire{
+    width: 90%;
+    margin: 0 auto;
+    display: flex;
+    justify-content: center;
+    align-items: end;
+    position: absolute;
+    bottom: 0;
+    position: fixed;
+    background-color: white;
+}
+.commentaire form{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.commentaire form button{
+    margin: 0 auto;
+    font-size: 20px;
+    margin-bottom: 10px;
+    padding: 3px 50px;
+    color: white;
+    cursor: pointer;
+    background-color: #0d0d6f;
+    border-radius: 7px;
+}
+.commentaire form button:hover{
+    background-color: white;
+    border: 1px solid black;
+    color: black;
+}
+.commentaire form textarea{
+    width: 60%;
+    margin: 0 auto;
+    height: 10rem;
+    font-size: 1.1rem;
+    resize: none;
+    background-color: #eee;
+    border: none;
+    border-radius: 5px;
+    padding: 5px;
+    margin-bottom: 10px;
+    position: absolute;
+    position: sticky;
+    font-style: italic;
+    top: 10px;
+    left: 23%;
+}
+.commentaire form textarea:focus{
+    outline: none;
+    border: 1px solid #ccc;
+}

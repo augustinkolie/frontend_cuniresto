@@ -1,0 +1,127 @@
+body{
+    display: flex;
+    justify-content: center;
+    background-color: rgba(142, 68, 68, 0.264);
+}
+form{
+    display: flex;
+    justify-content: center;
+}
+
+
+.content{
+    display: block;
+     width: 330px; 
+    background-color: rgb(0, 0, 0);
+    height: auto;
+    margin-top: 100px;
+    border-radius: 20px;
+    padding: 5px;
+    border: solid 2px #F28123;
+}
+.h3{
+    background-color: #F28123;
+    text-align: center;
+    color: #ffffff;
+    letter-spacing: 1px;
+    font-weight: bold;
+    width: 40%;
+    border-radius: 20px;
+    cursor: pointer;
+}
+.barry{
+    padding-left: 10px;
+    color: white;
+    color: #F28123;
+    padding: 2px;
+    border-bottom: #706c69 solid;
+}
+.img{
+    display: flex;
+    width: 150px;
+    border-radius: 50%;
+    border: solid 5px #F28123;
+    position: absolute;
+    top: 20px;
+    cursor: pointer;
+    background-color: rgb(0, 0, 0);
+}
+button{
+    height:35px;
+    margin: 15px;
+    background-color: #F28123;
+    border: none;
+    border-radius: 10px;
+}
+button:hover{
+    background-color: green;
+}
+.bouton{
+    display: flex;
+    justify-content: center;
+}
+#lien{
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+}
+
+/* css suplementaire pour modif_profile*/
+input{
+    margin:6px;
+    background: transparent;
+    border: none;
+    border-bottom: solid rgb(166, 140, 140) 3px;
+    color: white;
+    
+}
+.content_m{
+    display: block;
+    width: 330px;
+    background-color: rgb(0, 0, 0);
+    height: auto;
+    margin-top: 100px;
+    border-radius: 20px;
+    padding: 5px;
+    border: solid 2px #F28123;}
+
+    label{
+        display: block;
+        color: #F28123;
+        margin: 0 5px;
+
+    }
+    .center_input{
+        display: grid;
+    }
+
+    .body{
+        display: flex;
+        justify-content: center;
+    }
+    .h3_2{
+        padding-top: 70px;
+        display: flex;
+        justify-content: center;
+    }
+    /* css pour la validation  personalisée du formaulaire*/
+    .invalid{
+        border-bottom: solid rgb(255, 0, 0) 3px;
+    }
+    /* .valide{
+        border-bottom: solid rgb(94, 255, 0) 3px; 
+    } */
+    .msg{
+        display: block;
+        color: red;
+        font-size: 12px;
+    }
+
+
+    @media (max-with:450px ){
+        .content_m{
+            width: 300px;
+        }
+        
+    }

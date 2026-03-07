@@ -1,0 +1,171 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: #f8f9fa;
+  color: #333;
+  overflow-x: hidden;
+}
+
+/* Dark mode styles */
+.dark body {
+  background-color: #111827 !important;
+  color: #f9fafb !important;
+}
+
+html.dark {
+  color-scheme: dark;
+}
+
+/* Dark mode for common elements */
+.dark .bg-white {
+  background-color: #1f2937 !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #111827 !important;
+}
+
+.dark .text-gray-800 {
+  color: #f9fafb !important;
+}
+
+.dark .text-gray-700 {
+  color: #d1d5db !important;
+}
+
+.dark .text-gray-600 {
+  color: #9ca3af !important;
+}
+
+.dark .border-gray-200 {
+  border-color: #374151 !important;
+}
+
+.dark .border-gray-300 {
+  border-color: #4b5563 !important;
+}
+
+.dark .shadow-lg {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Chatbot specific dark mode styles */
+.dark .bg-gray-100 {
+  background-color: #374151 !important;
+}
+
+.dark .bg-gray-700 {
+  background-color: #374151 !important;
+}
+
+.dark .border-gray-600 {
+  border-color: #4b5563 !important;
+}
+
+.dark .border-gray-700 {
+  border-color: #374151 !important;
+}
+
+html {
+  scroll-behavior: smooth;
+  overflow-x: hidden;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-in-out;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.3s ease-out;
+}
+
+/* Scrollbar modern style - Slim and subtle */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1; /* Light mode: slate-300 */
+  border-radius: 20px;
+  border: 1px solid transparent;
+  background-clip: content-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8; /* Light mode hover: slate-400 */
+}
+
+/* Dark mode scrollbar thumb */
+.dark ::-webkit-scrollbar-thumb {
+  background: #374151; /* Dark mode: gray-700 */
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4b5563; /* Dark mode hover: gray-600 */
+}
+
+/* Masquer la scrollbar pour certaines zones */
+.hide-scrollbar {
+  scrollbar-width: none !important; /* Firefox */
+  -ms-overflow-style: none !important; /* IE and Edge */
+}
+
+.hide-scrollbar::-webkit-scrollbar {
+  display: none !important; /* Chrome, Safari, Opera */
+  width: 0 !important;
+  height: 0 !important;
+}
