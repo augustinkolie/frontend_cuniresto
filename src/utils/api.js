@@ -37,9 +37,12 @@ apiClient.interceptors.response.use(
   error => {
     // Erreur réseau (serveur non accessible)
     if (!error.response) {
+      const isDev = !import.meta.env.PROD;
       return Promise.reject({
         success: false,
-        message: 'Erreur de connexion. Vérifiez que le serveur est démarré sur http://localhost:8000'
+        message: isDev 
+          ? 'Erreur de connexion. Vérifiez que le serveur est démarré sur http://localhost:8000'
+          : 'Erreur de connexion au serveur. Le backend est peut-être hors-ligne ou l\'URL est incorrecte.'
       })
     }
 
