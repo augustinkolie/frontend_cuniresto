@@ -42,12 +42,13 @@ import NotFound from './pages/NotFound'
 import { ThemeProvider } from './context/ThemeContext'
 import LoadingScreen from './components/LoadingScreen'
 
-function App() {
+const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+
+function AppContent() {
   return (
-    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
-      <Router>
-        <ThemeProvider>
-          <AuthProvider>
+    <Router>
+      <ThemeProvider>
+        <AuthProvider>
           <CartProvider>
             <NotificationProvider>
               <FavoriteProvider>
@@ -101,6 +102,18 @@ function App() {
         </AuthProvider>
       </ThemeProvider>
     </Router>
+  )
+}
+
+function App() {
+  if (!clientId) {
+    console.warn("⚠️ VITE_GOOGLE_CLIENT_ID est manquant. La connexion Google sera désactivée.")
+    return <AppContent />
+  }
+
+  return (
+    <GoogleOAuthProvider clientId={clientId}>
+      <AppContent />
     </GoogleOAuthProvider>
   )
 }

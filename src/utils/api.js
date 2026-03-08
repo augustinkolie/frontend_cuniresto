@@ -6,8 +6,8 @@ const axiosInstance = axios.create({
   timeout: 30000,
 })
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api'
-const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT || 15000
+const API_URL = import.meta.env.VITE_API_URL || (import.meta.env.PROD ? '/api' : 'http://localhost:8000/api')
+const API_TIMEOUT = import.meta.env.VITE_API_TIMEOUT || 30000
 
 // Créer une instance axios
 const apiClient = axios.create({
