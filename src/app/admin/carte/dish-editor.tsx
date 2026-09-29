@@ -2,7 +2,7 @@
 
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { ImagePlus, Plus, Trash2 } from 'lucide-react'
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'

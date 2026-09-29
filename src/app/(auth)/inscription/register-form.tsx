@@ -77,8 +77,8 @@ export function RegisterForm() {
 
   return (
     <div>
-      <h1 className="font-display text-4xl font-bold">Inscription</h1>
-      <p className="mt-2 text-sm text-muted">
+      <h1 className="text-center font-display text-4xl font-bold">Inscription</h1>
+      <p className="mt-2 text-center text-sm text-muted">
         Déjà inscrit ?{' '}
         <Link href={withNext('/connexion', next)} className="font-semibold text-primary hover:underline">
           Connectez-vous
@@ -86,7 +86,7 @@ export function RegisterForm() {
       </p>
 
       {invite && (
-        <p className="mt-4 inline-flex items-center gap-2 text-sm text-primary">
+        <p className="mt-4 flex items-center justify-center gap-2 text-sm text-primary">
           <Gift className="h-4 w-4" /> +300 points offerts
         </p>
       )}
@@ -121,7 +121,7 @@ export function RegisterForm() {
         )}
 
         <form onSubmit={submit} className="space-y-4" noValidate>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="space-y-4">
             <Field label="Prénom" error={errors.firstName?.message}>
               {(p) => <Input {...p} autoComplete="given-name" autoFocus {...form.register('firstName')} />}
             </Field>

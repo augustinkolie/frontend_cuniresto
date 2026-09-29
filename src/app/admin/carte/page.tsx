@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Eye, EyeOff, Pencil, Plus, Star, Trash2 } from 'lucide-react'
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { AdminHeader, Table, Td } from '@/components/admin/ui'

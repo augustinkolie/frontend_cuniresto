@@ -7,16 +7,17 @@ import { toast } from 'sonner'
 import { AdminHeader, Table, Td } from '@/components/admin/ui'
 import { Button } from '@/components/ui/button'
 import { Dialog } from '@/components/ui/dialog'
-import { Field, Input, Select, Textarea } from '@/components/ui/field'
+import { Checkbox, Field, Input, Select, Textarea } from '@/components/ui/field'
 import { Card, Tabs } from '@/components/ui/misc'
 import { PageLoader } from '@/components/ui/spinner'
 import { del, errorMessage, get, patch, post, put } from '@/lib/api'
-import { gnf } from '@/lib/format'
-import type { AcademyCourse, AcademyResource, LiveSession } from '@/lib/types'
+import { formatDate, gnf } from '@/lib/format'
+import { PAYMENT_PROVIDER } from '@/lib/labels'
+import type { AcademyCourse, AcademyResource, CourseEnrollment, LiveSession } from '@/lib/types'
 
-type CourseForm = Omit<AcademyCourse, 'id' | 'modules'> & { modules: string }
+type CourseForm = Omit<AcademyCourse, 'id' | 'modules' | 'perks' | 'seats' | 'seatsLeft'> & { modules: string; perks: string; seats: string }
 
-const emptyCourse: CourseForm = { title: '', instructor: '', level: 'Débutant', duration: '4 semaines', lessons: 8, students: 0, rating: 0, price: 50000, imageUrl: '/images/academy/african-cuisine.png', category: 'Cuisine traditionnelle', description: '', modules: '' }
+const emptyCourse: CourseForm = { title: '', instructor: '', level: 'Débutant', duration: '4 semaines', lessons: 8, students: 0, rating: 0, price: 50000, imageUrl: '/images/academy/african-cuisine.png', category: 'Cuisine traditionnelle', description: '', modules: '', onSite: false, featured: false, schedule: '', seats: '', perks: '' }
 
 /** Modules saisis une ligne par module : « Titre | durée ». */
 const parseModules = (text: string) =>
@@ -31,7 +32,7 @@ const parseModules = (text: string) =>
 
 export default function AcademyAdminPage() {
   const client = useQueryClient()
-  const [tab, setTab] = useState<'live' | 'courses' | 'resources'>('live')
+  const [tab, setTab] = useState<'live' | 'courses' | 'enrollments' | 'resources'>('live')
   const [editing, setEditing] = useState<AcademyCourse | 'new' | null>(null)
   const [course, setCourse] = useState<CourseForm>(emptyCourse)
   const [resource, setResource] = useState({ title: '', description: '', fileUrl: '', category: 'recette', type: 'pdf' })
@@ -50,7 +51,15 @@ export default function AcademyAdminPage() {
 
   const saveCourse = useMutation({
     mutationFn: () => {
-      const body = { ...course, modules: parseModules(course.modules) }
+      // Champs envoyés explicitement (l'API refuse les propriétés inconnues).
+      const { title, instructor, level, duration, lessons, students, rating, price, imageUrl, category, description, onSite, featured } = course
+      const body = {
+        title, instructor, level, duration, lessons, students, rating, price, imageUrl, category, description, onSite, featured,
+        modules: parseModules(course.modules),
+        schedule: course.schedule?.trim() || undefined,
+        seats: course.seats ? Number(course.seats) : null,
+        perks: course.perks.split('\n').map((l) => l.trim()).filter(Boolean),
+      }
       return editing === 'new' || !editing ? post('/admin/academy/courses', body) : patch(`/admin/academy/courses/${editing.id}`, body)
     },
     onSuccess: () => (setEditing(null), refresh()),
@@ -75,7 +84,17 @@ export default function AcademyAdminPage() {
 
   const open = (c: AcademyCourse | 'new') => {
     setEditing(c)
-    setCourse(c === 'new' ? emptyCourse : { ...c, modules: c.modules.map((m) => `${m.title} | ${m.duration}`).join('\n') })
+    setCourse(
+      c === 'new'
+        ? emptyCourse
+        : {
+            ...c,
+            modules: c.modules.map((m) => `${m.title} | ${m.duration}`).join('\n'),
+            perks: c.perks.join('\n'),
+            seats: c.seats ? String(c.seats) : '',
+            schedule: c.schedule ?? '',
+          },
+    )
   }
 
   return (
@@ -88,6 +107,7 @@ export default function AcademyAdminPage() {
         items={[
           { value: 'live', label: 'Studio en direct' },
           { value: 'courses', label: 'Formations' },
+          { value: 'enrollments', label: 'Inscriptions' },
           { value: 'resources', label: 'Ressources' },
         ]}
       />
@@ -130,14 +150,17 @@ export default function AcademyAdminPage() {
                 <Plus className="h-4 w-4" /> Nouvelle formation
               </Button>
             </div>
-            <Table head={['Formation', 'Formateur', 'Niveau', 'Prix', 'Élèves', '']}>
+            <Table head={['Formation', 'Lieu', 'Niveau', 'Prix', 'Places', '']}>
               {courses.data.map((c) => (
                 <tr key={c.id}>
-                  <Td className="font-semibold">{c.title}</Td>
-                  <Td>{c.instructor}</Td>
+                  <Td className="font-semibold">
+                    {c.title}
+                    {c.featured && <span className="ml-2 rounded-full bg-primary/15 px-2 py-0.5 text-xs text-primary">Recommandée</span>}
+                  </Td>
+                  <Td>{c.onSite ? 'Au restaurant' : 'En ligne'}</Td>
                   <Td>{c.level}</Td>
                   <Td className="tabular">{gnf(c.price)}</Td>
-                  <Td className="tabular">{c.students}</Td>
+                  <Td className="tabular">{c.seats === null ? '—' : `${c.seatsLeft} / ${c.seats}`}</Td>
                   <Td>
                     <div className="flex justify-end gap-1">
                       <button type="button" onClick={() => open(c)} className="rounded-full p-2 hover:bg-text/10" aria-label={`Modifier ${c.title}`}>
@@ -153,6 +176,8 @@ export default function AcademyAdminPage() {
             </Table>
           </>
         ))}
+
+      {tab === 'enrollments' && <Enrollments />}
 
       {tab === 'resources' && (
         <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
@@ -224,6 +249,19 @@ export default function AcademyAdminPage() {
           <Field label="Prix (GNF)">{(p) => <Input {...p} type="number" min={0} value={course.price} onChange={(e) => setCourse({ ...course, price: Number(e.target.value) })} />}</Field>
           <Field label="Image (URL)" className="sm:col-span-2">{(p) => <Input {...p} required value={course.imageUrl} onChange={(e) => setCourse({ ...course, imageUrl: e.target.value })} />}</Field>
           <Field label="Description" className="sm:col-span-2">{(p) => <Textarea {...p} rows={3} required value={course.description} onChange={(e) => setCourse({ ...course, description: e.target.value })} />}</Field>
+          <div className="flex flex-wrap gap-6 sm:col-span-2">
+            <Checkbox label="Formule donnée au restaurant" checked={course.onSite} onChange={(e) => setCourse({ ...course, onSite: e.target.checked })} />
+            <Checkbox label="Formule recommandée (mise en avant)" checked={course.featured} onChange={(e) => setCourse({ ...course, featured: e.target.checked })} />
+          </div>
+          <Field label="Horaires et lieu" hint="Ex. : Samedi 9 h – 12 h, au restaurant">
+            {(p) => <Input {...p} value={course.schedule ?? ''} onChange={(e) => setCourse({ ...course, schedule: e.target.value })} />}
+          </Field>
+          <Field label="Places par session" hint="Vide = illimité">
+            {(p) => <Input {...p} type="number" min={1} value={course.seats} onChange={(e) => setCourse({ ...course, seats: e.target.value })} />}
+          </Field>
+          <Field label="Ce qui est inclus" hint="Un élément par ligne" className="sm:col-span-2">
+            {(p) => <Textarea {...p} rows={3} value={course.perks} onChange={(e) => setCourse({ ...course, perks: e.target.value })} />}
+          </Field>
           <Field label="Programme" hint="Un module par ligne : Titre | durée" className="sm:col-span-2">
             {(p) => <Textarea {...p} rows={4} value={course.modules} onChange={(e) => setCourse({ ...course, modules: e.target.value })} />}
           </Field>
@@ -232,6 +270,61 @@ export default function AcademyAdminPage() {
           </Button>
         </form>
       </Dialog>
+    </div>
+  )
+}
+
+type AdminEnrollment = CourseEnrollment & { user: { firstName: string; lastName: string; email: string; phone: string | null } }
+
+const ENROLLMENT_STATUS = {
+  CONFIRMED: { label: 'Payée', className: 'bg-success/20 text-success' },
+  PENDING_PAYMENT: { label: 'En attente de paiement', className: 'bg-accent/15 text-accent' },
+  CANCELLED: { label: 'Annulée', className: 'bg-text/10 text-muted' },
+} as const
+
+/** Inscriptions aux formations : qui, quoi, combien, par quel moyen. */
+function Enrollments() {
+  const { data } = useQuery({ queryKey: ['admin', 'academy', 'enrollments'], queryFn: () => get<AdminEnrollment[]>('/admin/academy/enrollments') })
+  if (!data) return <PageLoader />
+  const paid = data.filter((e) => e.status === 'CONFIRMED')
+  return (
+    <div className="space-y-4">
+      <p className="text-sm text-muted">
+        {paid.length} inscription(s) payée(s) · {gnf(paid.reduce((sum, e) => sum + e.amount, 0))} encaissés
+      </p>
+      <Table head={['N°', 'Élève', 'Formation', 'Montant', 'Paiement', 'Statut', 'Date']}>
+        {data.map((e) => {
+          const status = ENROLLMENT_STATUS[e.status]
+          return (
+            <tr key={e.id}>
+              <Td className="tabular">{e.number}</Td>
+              <Td>
+                <p className="font-semibold">
+                  {e.user.firstName} {e.user.lastName}
+                </p>
+                <p className="text-xs text-muted">
+                  {e.user.email}
+                  {e.user.phone ? ` · ${e.user.phone}` : ''}
+                </p>
+              </Td>
+              <Td>{e.courseTitle}</Td>
+              <Td className="tabular">{gnf(e.amount)}</Td>
+              <Td>{e.payment ? PAYMENT_PROVIDER[e.payment.provider] : '—'}</Td>
+              <Td>
+                <span className={`rounded-full px-2 py-0.5 text-xs font-semibold ${status.className}`}>{status.label}</span>
+              </Td>
+              <Td className="tabular">{formatDate(e.createdAt)}</Td>
+            </tr>
+          )
+        })}
+        {data.length === 0 && (
+          <tr>
+            <Td colSpan={7} className="py-8 text-center text-muted">
+              Aucune inscription pour l’instant.
+            </Td>
+          </tr>
+        )}
+      </Table>
     </div>
   )
 }

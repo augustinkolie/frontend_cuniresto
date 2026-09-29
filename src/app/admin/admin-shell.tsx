@@ -7,6 +7,7 @@ import {
   BookOpen,
   Building2,
   CalendarDays,
+  FileText,
   ChefHat,
   Clapperboard,
   Gift,
@@ -76,7 +77,8 @@ const SECTIONS: Array<{ title: string; items: NavItem[] }> = [
     items: [
       { href: '/admin/contenus', label: 'Vidéos du chef', icon: Clapperboard, roles: M },
       { href: '/admin/academie', label: 'Académie & direct', icon: BookOpen, roles: M },
-      { href: '/admin/site', label: 'Horaires & textes', icon: Store, roles: M },
+      { href: '/admin/pages', label: 'Pages du site', icon: FileText, roles: M },
+      { href: '/admin/site', label: 'Horaires & newsletter', icon: Store, roles: M },
       { href: '/admin/parametres', label: 'Paramètres', icon: Settings, roles: ['ADMIN'] },
     ],
   },

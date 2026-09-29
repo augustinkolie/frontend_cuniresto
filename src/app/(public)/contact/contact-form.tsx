@@ -49,7 +49,7 @@ export function ContactForm() {
 
   return (
     <form onSubmit={submit} className="space-y-4" noValidate>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="space-y-4">
         <Field label="Prénom" error={errors.firstName?.message}>
           {(p) => <Input {...p} autoComplete="given-name" {...form.register('firstName')} />}
         </Field>

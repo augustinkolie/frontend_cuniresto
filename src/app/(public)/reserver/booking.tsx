@@ -218,7 +218,7 @@ export function Booking() {
             <h2 className={stepTitle}>
               <span className={stepNumber}>04</span> Vos coordonnées
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="space-y-4">
               <Field label="Prénom" error={errors.firstName?.message}>
                 {(p) => <Input {...p} autoComplete="given-name" {...form.register('firstName')} />}
               </Field>

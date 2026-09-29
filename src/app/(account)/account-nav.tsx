@@ -1,6 +1,6 @@
 'use client'
 
-import { CalendarDays, Gift, Heart, MapPin, MessageCircle, Receipt, Settings, User } from 'lucide-react'
+import { CalendarDays, Gift, GraduationCap, Heart, MapPin, MessageCircle, Receipt, Settings, User } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/cn'
@@ -9,6 +9,7 @@ const LINKS = [
   { href: '/compte', label: 'Profil', icon: User },
   { href: '/compte/commandes', label: 'Commandes', icon: Receipt },
   { href: '/compte/reservations', label: 'Réservations', icon: CalendarDays },
+  { href: '/compte/formations', label: 'Formations', icon: GraduationCap },
   { href: '/compte/fidelite', label: 'Fidélité', icon: Gift },
   { href: '/compte/favoris', label: 'Favoris', icon: Heart },
   { href: '/compte/adresses', label: 'Adresses', icon: MapPin },

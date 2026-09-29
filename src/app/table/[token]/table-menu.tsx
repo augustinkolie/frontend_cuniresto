@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { BellRing, Minus, Plus, Search, ShoppingBag } from 'lucide-react'
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Logo } from '@/components/brand/logo'

@@ -34,10 +34,10 @@ export default function ForgotPasswordPage() {
 
   return (
     <div>
-      <Link href="/connexion" className="mb-8 inline-flex items-center gap-2 text-sm font-semibold text-muted hover:text-text">
+      <Link href="/connexion" className="mb-6 flex items-center justify-center gap-2 text-sm font-semibold text-muted hover:text-text">
         <ArrowLeft className="h-4 w-4" /> Retour à la connexion
       </Link>
-      <h1 className="text-[36px] font-semibold">Mot de passe oublié</h1>
+      <h1 className="text-center font-display text-4xl font-bold">Mot de passe oublié</h1>
       <ol className="mt-4 flex gap-2" aria-label="Étapes">
         {(['email', 'code', 'password'] as Step[]).map((s, i) => (
           <li

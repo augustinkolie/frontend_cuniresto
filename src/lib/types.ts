@@ -368,6 +368,33 @@ export interface AcademyCourse {
   category: string
   description: string
   modules: Array<{ title: string; duration: string }>
+  /** Formule donnée au restaurant. */
+  onSite: boolean
+  featured: boolean
+  schedule: string | null
+  seats: number | null
+  seatsLeft: number | null
+  perks: string[]
+}
+
+export type EnrollmentStatus = 'PENDING_PAYMENT' | 'CONFIRMED' | 'CANCELLED'
+
+export interface CourseEnrollment {
+  id: string
+  number: number
+  courseId: string | null
+  courseTitle: string
+  amount: number
+  status: EnrollmentStatus
+  createdAt: string
+  course: { imageUrl: string; schedule: string | null; onSite: boolean; duration?: string; instructor?: string } | null
+  payment: { provider: PaymentProvider; status: string; checkoutUrl?: string | null } | null
+}
+
+export interface EnrollResult {
+  enrollmentId: string
+  checkoutUrl: string | null
+  instructions: string | null
 }
 
 export interface AcademyResource {

@@ -1,6 +1,6 @@
 'use client'
 
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { useState } from 'react'
 import { AddToCartButton } from '@/components/menu/add-to-cart-button'

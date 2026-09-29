@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers'
+import { mergeContent, type PageContent, type PageKey } from './site-content'
 
 // Appels à l'API depuis les Server Components uniquement (next/headers échoue côté client).
 // Contenu public : mis en cache avec des tags, vidés par l'API via /api/revalidate.
@@ -58,4 +59,10 @@ export async function sessionFetch<T>(path: string): Promise<T | null> {
   } catch {
     return null
   }
+}
+
+/** Contenu éditable d'une page, fusionné avec les textes par défaut. */
+export async function pageContent<K extends PageKey>(key: K): Promise<PageContent<K>> {
+  const data = await publicFetch<{ value: unknown }>(`/content/${key}`, ['content'])
+  return mergeContent(key, data?.value)
 }

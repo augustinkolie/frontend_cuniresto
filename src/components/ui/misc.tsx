@@ -1,5 +1,5 @@
 import { Star } from 'lucide-react'
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import type { ReactNode } from 'react'
 import { cn } from '@/lib/cn'
 import { initials } from '@/lib/format'

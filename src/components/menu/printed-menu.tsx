@@ -1,7 +1,7 @@
 'use client'
 
 import { Flame, Leaf, Plus } from 'lucide-react'
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { useState } from 'react'
 import { toast } from 'sonner'

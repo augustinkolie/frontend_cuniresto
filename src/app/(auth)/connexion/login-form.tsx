@@ -70,8 +70,8 @@ export function LoginForm() {
 
   return (
     <div>
-      <h1 className="font-display text-4xl font-bold">Connexion</h1>
-      <p className="mt-2 text-sm text-muted">
+      <h1 className="text-center font-display text-4xl font-bold">Connexion</h1>
+      <p className="mt-2 text-center text-sm text-muted">
         Pas de compte ?{' '}
         <Link href={withNext('/inscription', next)} className="font-semibold text-primary hover:underline">
           Inscrivez-vous

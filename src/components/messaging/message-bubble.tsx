@@ -1,7 +1,7 @@
 'use client'
 
 import { Check, CheckCheck, CornerUpLeft, Download, FileText, SmilePlus, Star, Trash2 } from 'lucide-react'
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import { useState } from 'react'
 import { cn } from '@/lib/cn'
 import { fileSize, formatTime } from '@/lib/format'

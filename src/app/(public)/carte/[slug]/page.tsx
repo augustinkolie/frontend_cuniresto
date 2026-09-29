@@ -1,6 +1,6 @@
 import { ArrowLeft, Clock, Star } from 'lucide-react'
 import type { Metadata } from 'next'
-import Image from 'next/image'
+import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { PrintedMenu } from '@/components/menu/printed-menu'

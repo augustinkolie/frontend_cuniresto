@@ -6,7 +6,7 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { AdminHeader } from '@/components/admin/ui'
 import { Button } from '@/components/ui/button'
-import { Checkbox, Field, Input, Textarea } from '@/components/ui/field'
+import { Checkbox, Field, Input } from '@/components/ui/field'
 import { Card, Tabs } from '@/components/ui/misc'
 import { PageLoader } from '@/components/ui/spinner'
 import { del, errorMessage, get, post, put } from '@/lib/api'
@@ -16,22 +16,20 @@ import type { OpeningHours } from '@/lib/types'
 type Day = OpeningHours['hours'][number]
 
 export default function SiteAdminPage() {
-  const [tab, setTab] = useState<'hours' | 'about' | 'newsletter'>('hours')
+  const [tab, setTab] = useState<'hours' | 'newsletter'>('hours')
   return (
     <div>
-      <AdminHeader title="Horaires & textes" description="Les modifications apparaissent sur le site en quelques secondes." />
+      <AdminHeader title="Horaires & newsletter" description="Les textes et photos des pages se modifient dans « Pages du site »." />
       <Tabs
         className="mb-5"
         value={tab}
         onChange={setTab}
         items={[
           { value: 'hours', label: 'Horaires & fermetures' },
-          { value: 'about', label: 'Page « À propos »' },
           { value: 'newsletter', label: 'Newsletter' },
         ]}
       />
       {tab === 'hours' && <Hours />}
-      {tab === 'about' && <About />}
       {tab === 'newsletter' && <Newsletter />}
     </div>
   )
@@ -110,43 +108,6 @@ function Hours() {
         </ul>
       </Card>
     </div>
-  )
-}
-
-function About() {
-  const { data } = useQuery({
-    queryKey: ['admin', 'content', 'about'],
-    queryFn: () => get<{ value: { title?: string; intro?: string; story?: string[] } | null }>('/content/about'),
-  })
-  const [form, setForm] = useState({ title: '', intro: '', story: '' })
-  useEffect(() => {
-    if (data) setForm({ title: data.value?.title ?? '', intro: data.value?.intro ?? '', story: (data.value?.story ?? []).join('\n\n') })
-  }, [data])
-  const save = useMutation({
-    mutationFn: () =>
-      put('/admin/content/about', {
-        value: {
-          title: form.title || undefined,
-          intro: form.intro || undefined,
-          story: form.story ? form.story.split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean) : undefined,
-        },
-      }),
-    onSuccess: () => toast.success('Page mise à jour'),
-    onError: (e) => toast.error(errorMessage(e)),
-  })
-  if (!data) return <PageLoader />
-  return (
-    <Card className="max-w-3xl space-y-4 p-6">
-      <p className="text-sm text-muted">Laissez un champ vide pour garder le texte par défaut.</p>
-      <Field label="Titre">{(p) => <Input {...p} value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} />}</Field>
-      <Field label="Introduction">{(p) => <Textarea {...p} rows={2} value={form.intro} onChange={(e) => setForm({ ...form, intro: e.target.value })} />}</Field>
-      <Field label="Notre histoire" hint="Séparez les paragraphes par une ligne vide">
-        {(p) => <Textarea {...p} rows={8} value={form.story} onChange={(e) => setForm({ ...form, story: e.target.value })} />}
-      </Field>
-      <Button onClick={() => save.mutate()} loading={save.isPending}>
-        Publier
-      </Button>
-    </Card>
   )
 }
 

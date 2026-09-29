@@ -2,13 +2,14 @@
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
-import { Bike, CreditCard, Package, ShoppingBag, Smartphone, Store, Trash2, Wallet, Zap } from 'lucide-react'
-import Image from 'next/image'
+import { Bike, Package, ShoppingBag, Store, Trash2, Zap } from 'lucide-react'
+import Image from '@/components/ui/photo'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
+import { Choice, PAYMENT_UI } from '@/components/payment/payment-choice'
 import { Button, LinkButton } from '@/components/ui/button'
 import { Field, Input, Textarea } from '@/components/ui/field'
 import { Card, EmptyState, QuantityStepper } from '@/components/ui/misc'
@@ -20,51 +21,6 @@ import { gnf } from '@/lib/format'
 import { type CheckoutValues, checkoutSchema } from '@/lib/schemas'
 import type { Address, PaymentMethod, PlaceOrderResult } from '@/lib/types'
 import { cartTotals, useCart } from '@/stores/cart'
-
-const PAYMENT_UI = {
-  ORANGE_MONEY: { label: 'Orange Money', hint: 'Paiement mobile, validé sur votre téléphone', icon: Smartphone },
-  CARD: { label: 'Carte bancaire', hint: 'Visa, Mastercard — paiement sécurisé Stripe', icon: CreditCard },
-  PAYPAL: { label: 'PayPal', hint: 'Compte PayPal ou carte via PayPal', icon: Wallet },
-} as const
-
-function Choice({
-  selected,
-  onSelect,
-  icon: Icon,
-  title,
-  hint,
-  aside,
-  disabled,
-}: {
-  selected: boolean
-  onSelect: () => void
-  icon: typeof Bike
-  title: string
-  hint: string
-  aside?: string
-  disabled?: boolean
-}) {
-  return (
-    <button
-      type="button"
-      role="radio"
-      aria-checked={selected}
-      disabled={disabled}
-      onClick={onSelect}
-      className={cn(
-        'flex w-full items-center gap-4 rounded-[var(--radius-control)] border p-4 text-left transition-colors disabled:opacity-40',
-        selected ? 'border-primary bg-primary/10' : 'border-line hover:border-text/40',
-      )}
-    >
-      <Icon className={cn('h-6 w-6 shrink-0', selected ? 'text-primary' : 'text-muted')} aria-hidden />
-      <span className="flex-1">
-        <span className="block font-semibold">{title}</span>
-        <span className="block text-sm text-muted">{hint}</span>
-      </span>
-      {aside && <span className="tabular text-sm font-semibold">{aside}</span>}
-    </button>
-  )
-}
 
 export function Checkout() {
   const { user, isLoading } = useSession()
