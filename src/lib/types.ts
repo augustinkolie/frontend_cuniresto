@@ -429,6 +429,8 @@ export interface RestaurantSettings {
   address: string
   city: string
   mapUrl?: string
+  latitude?: number
+  longitude?: number
   socials: { facebook?: string; instagram?: string; tiktok?: string }
 }
 

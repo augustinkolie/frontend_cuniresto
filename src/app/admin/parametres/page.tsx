@@ -70,6 +70,12 @@ export default function SettingsAdminPage() {
           <Field label="E-mail">{(p) => <Input {...p} type="email" value={r.email} onChange={(e) => setR({ email: e.target.value })} />}</Field>
           <Field label="Adresse">{(p) => <Input {...p} value={r.address} onChange={(e) => setR({ address: e.target.value })} />}</Field>
           <Field label="Ville">{(p) => <Input {...p} value={r.city} onChange={(e) => setR({ city: e.target.value })} />}</Field>
+          <Field label="Latitude (plan)" hint="Clic droit sur le restaurant dans Google Maps : le premier nombre">
+            {(p) => <Input {...p} type="number" step="any" value={r.latitude ?? ''} onChange={(e) => setR({ latitude: e.target.value === '' ? undefined : Number(e.target.value) })} />}
+          </Field>
+          <Field label="Longitude (plan)" hint="…et le second nombre">
+            {(p) => <Input {...p} type="number" step="any" value={r.longitude ?? ''} onChange={(e) => setR({ longitude: e.target.value === '' ? undefined : Number(e.target.value) })} />}
+          </Field>
           <Field label="Facebook">{(p) => <Input {...p} type="url" value={r.socials.facebook ?? ''} onChange={(e) => setR({ socials: { ...r.socials, facebook: e.target.value } })} />}</Field>
           <Field label="Instagram">{(p) => <Input {...p} type="url" value={r.socials.instagram ?? ''} onChange={(e) => setR({ socials: { ...r.socials, instagram: e.target.value } })} />}</Field>
           <Field label="TikTok">{(p) => <Input {...p} type="url" value={r.socials.tiktok ?? ''} onChange={(e) => setR({ socials: { ...r.socials, tiktok: e.target.value } })} />}</Field>

@@ -11,6 +11,12 @@ export const metadata: Metadata = {
   description: 'Adresse, téléphone, horaires et formulaire de contact de Maison Braise à Conakry.',
 }
 
+/** Plan OpenStreetMap intégrable (sans clé ni bandeau de consentement), centré sur le restaurant. */
+function osmEmbed(lat: number, lng: number): string {
+  const bbox = [lng - 0.006, lat - 0.0035, lng + 0.006, lat + 0.0035].map((n) => n.toFixed(5)).join(',')
+  return `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${lat},${lng}`
+}
+
 export default async function ContactPage() {
   const [settings, hours, content] = await Promise.all([
     publicFetch<{ restaurant: RestaurantSettings }>('/settings/public', ['content']),
@@ -19,7 +25,9 @@ export default async function ContactPage() {
   ])
   const { header, map } = content
   const r = settings?.restaurant
-  const query = encodeURIComponent(`${r?.address ?? 'Kaloum'}, ${r?.city ?? 'Conakry'}, Guinée`)
+  // Position du restaurant (Administration > Paramètres) ; par défaut, Kaloum.
+  const lat = r?.latitude ?? 9.5092
+  const lng = r?.longitude ?? -13.7122
 
   const jsonLd = r && {
     '@context': 'https://schema.org',
@@ -99,14 +107,28 @@ export default async function ContactPage() {
         </Card>
       </div>
 
-      {map.visible && (
-      <iframe
-        title="Plan d’accès à Maison Braise"
-        src={`https://maps.google.com/maps?q=${query}&output=embed`}
-        loading="lazy"
-        className="mt-10 aspect-[4/3] w-full rounded-[var(--radius-card)] border border-line sm:aspect-[21/9]"
-        referrerPolicy="no-referrer-when-downgrade"
-      />
+      {map.visible && r && (
+        <section className="mt-10" aria-label="Plan d’accès">
+          <iframe
+            title="Plan d’accès à Maison Braise"
+            src={osmEmbed(lat, lng)}
+            loading="lazy"
+            className="aspect-[4/3] w-full rounded-[var(--radius-card)] border border-line sm:aspect-[21/9]"
+          />
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
+            <p>
+              {r.address}, {r.city}
+            </p>
+            <a
+              href={`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`}
+              target="_blank"
+              rel="noopener"
+              className="inline-flex items-center gap-1.5 font-semibold text-primary hover:underline"
+            >
+              <MapPin className="h-4 w-4" /> Itinéraire dans Google Maps
+            </a>
+          </div>
+        </section>
       )}
     </div>
   )

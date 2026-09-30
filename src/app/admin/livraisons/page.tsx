@@ -101,7 +101,8 @@ export default function DeliveriesPage() {
                     size="sm"
                     onClick={() => {
                       setAssigning(d)
-                      setDriverId(d.driverId ?? '')
+                      // Par défaut, un livreur de l'équipe : sinon la course n'apparaît dans aucune application.
+                      setDriverId(d.driverId ?? (d.driverName ? '' : (drivers.data?.[0]?.id ?? '')))
                       setExternal({ driverName: '', driverPhone: '', driverVehicle: d.driverVehicle ?? '' })
                     }}
                   >
@@ -126,17 +127,20 @@ export default function DeliveriesPage() {
           <Field label="Livreur de l’équipe" hint="Il reçoit la course dans son application">
             {(p) => (
               <Select {...p} value={driverId} onChange={(e) => setDriverId(e.target.value)}>
-                <option value="">— Livreur externe —</option>
                 {drivers.data?.map((u) => (
                   <option key={u.id} value={u.id}>
                     {u.firstName} {u.lastName}
                   </option>
                 ))}
+                <option value="">Livreur externe (sans application)</option>
               </Select>
             )}
           </Field>
           {!driverId && (
             <>
+              <p className="rounded-[var(--radius-control)] bg-accent/10 px-3 py-2 text-sm">
+                Un livreur externe n’a pas de compte : il ne verra pas la course dans l’application. Pour un membre de l’équipe, choisissez son nom dans la liste.
+              </p>
               <Field label="Nom du livreur externe">{(p) => <Input {...p} value={external.driverName} onChange={(e) => setExternal({ ...external, driverName: e.target.value })} />}</Field>
               <Field label="Téléphone">{(p) => <Input {...p} type="tel" value={external.driverPhone} onChange={(e) => setExternal({ ...external, driverPhone: e.target.value })} />}</Field>
             </>

@@ -47,11 +47,14 @@ export function Booking() {
   useEffect(() => setSlot(null), [date, partySize])
 
   const form = useForm<z.infer<typeof reservationSchema>>({ resolver: zodResolver(reservationSchema) })
+  const [editingContact, setEditingContact] = useState(true)
+  const [showMessage, setShowMessage] = useState(false)
   const { errors, isSubmitting } = form.formState
 
   useEffect(() => {
     if (!user) return
     form.reset({ firstName: user.firstName, lastName: user.lastName, email: user.email, phone: user.phone ?? '' })
+    setEditingContact(!user.phone)
   }, [user, form])
 
   const submit = form.handleSubmit(async (values) => {
@@ -63,7 +66,7 @@ export function Booking() {
     } catch (error) {
       toast.error(errorMessage(error))
     }
-  })
+  }, () => setEditingContact(true))
 
   if (confirmed) {
     return (
@@ -90,6 +93,7 @@ export function Booking() {
     { name: 'Midi', slots: freeSlots.filter((s) => s.time < '15:00') },
     { name: 'Soir', slots: freeSlots.filter((s) => s.time >= '15:00') },
   ].filter((g) => g.slots.length > 0)
+  const selectedDay = new Date(`${date}T12:00:00Z`)
   const stepTitle = 'flex items-baseline gap-3 font-display text-2xl'
   const stepNumber = 'font-mono text-sm text-primary'
 
@@ -198,46 +202,87 @@ export function Booking() {
         </section>
       </div>
 
-      {/* 04 — Récapitulatif façon ticket, puis coordonnées */}
+      {/* 04 — Récapitulatif (trois cases lisibles d'un coup d'œil), puis coordonnées */}
       <form onSubmit={submit} className="min-w-0 lg:sticky lg:top-28 lg:self-start" noValidate>
-        <div className="rounded-sm border border-line bg-surface">
-          <dl className="space-y-2 border-b border-dashed border-line px-6 py-5 font-mono text-sm">
-            {[
-              ['Date', formatDate(`${date}T12:00:00Z`, { weekday: 'long' })],
-              ['Couverts', `${partySize} pers.`],
-              ['Heure', slot ?? '—'],
-            ].map(([label, value]) => (
-              <div key={label} className="flex items-baseline">
-                <dt className="text-muted">{label}</dt>
-                <span className="leader" aria-hidden />
-                <dd className={cn(label === 'Heure' && slot && 'text-primary')}>{value}</dd>
+        <div className="overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface">
+          <div className="border-b border-line px-6 pb-5 pt-6">
+            <p className="eyebrow">Votre table</p>
+            <dl className="mt-4 grid grid-cols-3 divide-x divide-line text-center">
+              <div className="pr-3">
+                <dt className="font-mono text-[10px] uppercase tracking-widest text-muted">
+                  {selectedDay.toLocaleDateString('fr-FR', { weekday: 'long', timeZone: 'UTC' })}
+                </dt>
+                <dd className="mt-1 font-display text-3xl leading-none">{selectedDay.getUTCDate()}</dd>
+                <dd className="mt-1 text-xs text-muted">{selectedDay.toLocaleDateString('fr-FR', { month: 'long', timeZone: 'UTC' })}</dd>
               </div>
-            ))}
-          </dl>
+              <div className="px-3">
+                <dt className="font-mono text-[10px] uppercase tracking-widest text-muted">Couverts</dt>
+                <dd className="mt-1 font-display text-3xl leading-none">{partySize}</dd>
+                <dd className="mt-1 text-xs text-muted">{partySize > 1 ? 'personnes' : 'personne'}</dd>
+              </div>
+              <div className="pl-3">
+                <dt className="font-mono text-[10px] uppercase tracking-widest text-muted">Heure</dt>
+                <dd className={cn('mt-1 font-display text-3xl leading-none', slot ? 'text-primary' : 'text-muted/50')}>{slot ?? '––:––'}</dd>
+                <dd className="mt-1 text-xs text-muted">{slot ? 'confirmée à l’envoi' : 'à choisir'}</dd>
+              </div>
+            </dl>
+          </div>
+
           <div className="space-y-4 p-6">
             <h2 className={stepTitle}>
               <span className={stepNumber}>04</span> Vos coordonnées
             </h2>
-            <div className="space-y-4">
-              <Field label="Prénom" error={errors.firstName?.message}>
-                {(p) => <Input {...p} autoComplete="given-name" {...form.register('firstName')} />}
+
+            {!editingContact && user ? (
+              // Client connecté : pas de saisie, juste le nom sous lequel la table sera réservée.
+              <div className="flex items-start gap-3 rounded-[var(--radius-control)] bg-bg px-4 py-3">
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/15 font-semibold text-primary">
+                  {user.firstName[0]}
+                  {user.lastName[0]}
+                </span>
+                <div className="min-w-0 flex-1 text-sm">
+                  <p className="font-mono text-[10px] uppercase tracking-widest text-muted">Au nom de</p>
+                  <p className="text-base font-semibold">
+                    {user.firstName} {user.lastName}
+                  </p>
+                  <p className="break-all text-muted">{user.email}</p>
+                  <p className="text-muted">{user.phone}</p>
+                </div>
+                <button type="button" onClick={() => setEditingContact(true)} className="text-sm font-semibold text-primary hover:underline">
+                  Modifier
+                </button>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <Field label="Prénom" error={errors.firstName?.message}>
+                  {(p) => <Input {...p} className="h-11" autoComplete="given-name" {...form.register('firstName')} />}
+                </Field>
+                <Field label="Nom" error={errors.lastName?.message}>
+                  {(p) => <Input {...p} className="h-11" autoComplete="family-name" {...form.register('lastName')} />}
+                </Field>
+                <Field label="E-mail" hint="Pour recevoir la confirmation" error={errors.email?.message}>
+                  {(p) => <Input {...p} className="h-11" type="email" autoComplete="email" {...form.register('email')} />}
+                </Field>
+                <Field label="Téléphone" error={errors.phone?.message}>
+                  {(p) => <Input {...p} className="h-11" type="tel" autoComplete="tel" placeholder="620 00 00 00" {...form.register('phone')} />}
+                </Field>
+              </div>
+            )}
+
+            {showMessage ? (
+              <Field label="Demande particulière" error={errors.message?.message}>
+                {(p) => <Textarea {...p} rows={2} autoFocus placeholder="Anniversaire, chaise bébé, allergie…" {...form.register('message')} />}
               </Field>
-              <Field label="Nom" error={errors.lastName?.message}>
-                {(p) => <Input {...p} autoComplete="family-name" {...form.register('lastName')} />}
-              </Field>
-            </div>
-            <Field label="E-mail" error={errors.email?.message}>
-              {(p) => <Input {...p} type="email" autoComplete="email" {...form.register('email')} />}
-            </Field>
-            <Field label="Téléphone" error={errors.phone?.message}>
-              {(p) => <Input {...p} type="tel" autoComplete="tel" {...form.register('phone')} />}
-            </Field>
-            <Field label="Message (facultatif)" error={errors.message?.message}>
-              {(p) => <Textarea {...p} rows={2} placeholder="Anniversaire, chaise bébé, allergie…" {...form.register('message')} />}
-            </Field>
+            ) : (
+              <button type="button" onClick={() => setShowMessage(true)} className="text-sm font-semibold text-muted hover:text-primary">
+                + Ajouter une demande particulière
+              </button>
+            )}
+
             <Button type="submit" className="w-full" loading={isSubmitting} disabled={!slot}>
               {slot ? `Réserver pour ${slot}` : 'Choisissez un horaire'}
             </Button>
+            <p className="text-center text-xs text-muted">Confirmation envoyée par e-mail</p>
           </div>
         </div>
       </form>

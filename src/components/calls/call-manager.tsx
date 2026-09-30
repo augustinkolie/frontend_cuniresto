@@ -80,8 +80,14 @@ export function CallManager() {
       useCallStore.getState().set({ phase: 'outgoing', type: request.type, peer: request.peer, conversationId: request.conversationId, isCaller: true })
       const ack = await emitAck('call:initiate', { conversationId: request.conversationId, receiverId: request.peer!.id, type: request.type })
       if (!ack.ok || !ack.callId) {
-        toast.error(ack.error ?? 'Appel impossible')
-        useCallStore.getState().reset()
+        const unreachable = ack.error?.includes('joignable')
+        useCallStore.getState().set({
+          phase: 'ended',
+          endReason: unreachable
+            ? `${request.peer!.firstName} n’est pas en ligne pour le moment : votre appel manqué lui sera signalé.`
+            : (ack.error ?? 'Appel impossible'),
+        })
+        setTimeout(() => useCallStore.getState().phase === 'ended' && useCallStore.getState().reset(), 4000)
         return
       }
       useCallStore.getState().set({ callId: ack.callId })
@@ -224,7 +230,7 @@ export function CallManager() {
             </p>
           </>
         )}
-        <p className="tabular text-muted" aria-live="polite">
+        <p className="tabular max-w-sm px-4 text-muted" aria-live="polite">
           {label}
         </p>
       </div>
@@ -238,7 +244,11 @@ export function CallManager() {
               {isVideo ? <Video className="h-7 w-7" /> : <Phone className="h-7 w-7" />}
             </button>
           </>
-        ) : state.phase !== 'ended' ? (
+        ) : state.phase === 'ended' ? (
+          <button type="button" onClick={() => useCallStore.getState().reset()} className="rounded-full bg-surface-2 px-6 py-3 font-semibold">
+            Fermer
+          </button>
+        ) : (
           <>
             <button type="button" onClick={toggleMute} className="rounded-full bg-surface-2 p-4" aria-pressed={muted} aria-label={muted ? 'Réactiver le micro' : 'Couper le micro'}>
               {muted ? <MicOff className="h-6 w-6" /> : <Mic className="h-6 w-6" />}
@@ -252,7 +262,7 @@ export function CallManager() {
               <PhoneOff className="h-6 w-6" />
             </button>
           </>
-        ) : null}
+        )}
       </div>
     </div>
   )

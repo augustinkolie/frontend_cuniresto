@@ -87,6 +87,8 @@ export default function DriverPage() {
   }, [])
 
   if (isLoading || !user) return <PageLoader />
+  // Un admin ou un manager voit toutes les courses en cours, avec le nom du livreur.
+  const isDriver = user.role === 'DRIVER'
 
   return (
     <div data-theme="light" className="min-h-dvh bg-bg text-text">
@@ -96,7 +98,7 @@ export default function DriverPage() {
       </header>
       <main id="contenu" className="mx-auto max-w-xl space-y-4 p-4">
         <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-semibold">Mes courses</h1>
+          <h1 className="text-3xl font-semibold">{isDriver ? 'Mes courses' : 'Courses en cours'}</h1>
           <Button size="sm" variant={sharing ? 'primary' : 'secondary'} onClick={toggleSharing} disabled={active.length === 0 && !sharing}>
             <LocateFixed className="h-4 w-4" /> {sharing ? 'Position partagée' : 'Partager ma position'}
           </Button>
@@ -114,7 +116,15 @@ export default function DriverPage() {
             return (
               <article key={d.id} className="rounded-[var(--radius-card)] border border-line bg-surface p-5">
                 <div className="flex items-start justify-between">
-                  <p className="tabular text-3xl font-bold">#{d.order.number}</p>
+                  <div>
+                    <p className="tabular text-3xl font-bold">#{d.order.number}</p>
+                    {!isDriver && d.driverName && (
+                      <p className="mt-1 flex items-center gap-1.5 text-sm text-muted">
+                        <Bike className="h-4 w-4" /> {d.driverName}
+                        {!d.driverId && ' (externe)'}
+                      </p>
+                    )}
+                  </div>
                   <Badge tone="accent">{DELIVERY_STATUS[d.status]}</Badge>
                 </div>
                 <p className="mt-3 flex items-start gap-2 text-lg">

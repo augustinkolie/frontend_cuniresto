@@ -13,6 +13,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { useSession } from '@/hooks/use-session'
 import { useSocketEvent } from '@/hooks/use-socket-event'
 import { api, del, errorMessage, get, patch, post, put } from '@/lib/api'
+import { cn } from '@/lib/cn'
 import { formatDate } from '@/lib/format'
 import type { Conversation, CursorPage, Message, PublicUser } from '@/lib/types'
 import { Composer } from './composer'
@@ -53,6 +54,12 @@ export function ChatView({ conversationId, onBack }: { conversationId: string; o
     getNextPageParam: (last) => last.nextCursor ?? undefined,
   })
   const favorites = useQuery({ queryKey: ['favorite-contacts'], queryFn: () => get<PublicUser[]>('/me/favorite-contacts') })
+  // Présence des autres membres (application ouverte ou non), pour savoir si un appel peut aboutir.
+  const presence = useQuery({
+    queryKey: ['presence', conversationId],
+    queryFn: () => get<Record<string, boolean>>(`/conversations/${conversationId}/presence`),
+    refetchInterval: 20_000,
+  })
 
   // Pages chargées de la plus récente à la plus ancienne ; affichage chronologique.
   const list = [...(messages.data?.pages ?? [])].reverse().flatMap((p) => p.items)
@@ -176,15 +183,29 @@ export function ChatView({ conversationId, onBack }: { conversationId: string; o
         <div className="min-w-0 flex-1">
           <p className="truncate font-semibold">{conversationTitle(c, user.id)}</p>
           <p className="truncate text-xs text-muted">
-            {typing ? <span className="text-accent">{typing} écrit…</span> : c.isGroup ? `${c.members.length} membres` : c.disappearingSeconds ? 'Messages éphémères activés' : ' '}
+            {typing ? (
+              <span className="text-accent">{typing} écrit…</span>
+            ) : c.isGroup ? (
+              `${c.members.length} membres`
+            ) : other && presence.data ? (
+              <span className="inline-flex items-center gap-1.5">
+                <span className={cn('h-2 w-2 rounded-full', presence.data[other.id] ? 'bg-success' : 'bg-text/30')} aria-hidden />
+                {presence.data[other.id] ? 'En ligne' : 'Hors ligne'}
+                {c.disappearingSeconds ? ' · messages éphémères' : ''}
+              </span>
+            ) : c.disappearingSeconds ? (
+              'Messages éphémères activés'
+            ) : (
+              ' '
+            )}
           </p>
         </div>
         {other && (
           <>
-            <button type="button" onClick={() => startCall(c.id, other, 'AUDIO')} className="rounded-full p-2.5 hover:bg-text/10" aria-label="Appel audio">
+            <button type="button" onClick={() => startCall(c.id, other, 'AUDIO')} className="rounded-full p-2.5 hover:bg-text/10" aria-label="Appel audio" title={presence.data?.[other.id] === false ? `${other.firstName} est hors ligne` : 'Appel audio'}>
               <Phone className="h-5 w-5" />
             </button>
-            <button type="button" onClick={() => startCall(c.id, other, 'VIDEO')} className="rounded-full p-2.5 hover:bg-text/10" aria-label="Appel vidéo">
+            <button type="button" onClick={() => startCall(c.id, other, 'VIDEO')} className="rounded-full p-2.5 hover:bg-text/10" aria-label="Appel vidéo" title={presence.data?.[other.id] === false ? `${other.firstName} est hors ligne` : 'Appel vidéo'}>
               <Video className="h-5 w-5" />
             </button>
           </>

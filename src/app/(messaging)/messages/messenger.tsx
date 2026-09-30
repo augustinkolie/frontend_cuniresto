@@ -3,7 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { MessageCirclePlus, Phone, PhoneIncoming, PhoneMissed, PhoneOutgoing, Search, Star, Users, Video } from 'lucide-react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { ChatView, conversationTitle } from '@/components/messaging/chat-view'
 import { Button } from '@/components/ui/button'
@@ -39,6 +39,9 @@ export function Messenger() {
   const [tab, setTab] = useState<Tab>('all')
   const [filter, setFilter] = useState('')
   const [dialog, setDialog] = useState<'direct' | 'group' | null>(null)
+  // La session n'est connue que dans le navigateur : premier rendu identique à celui du serveur.
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
 
   const conversations = useQuery({ queryKey: ['conversations'], queryFn: () => get<Conversation[]>('/conversations') })
   const favorites = useQuery({ queryKey: ['favorite-contacts'], queryFn: () => get<PublicUser[]>('/me/favorite-contacts') })
@@ -71,10 +74,10 @@ export function Messenger() {
     return all.filter((c) => !q || (user && conversationTitle(c, user.id).toLowerCase().includes(q)))
   }, [conversations.data, filter, user])
 
-  if (!user) return <PageLoader />
+  if (!mounted || !user) return <PageLoader />
 
   return (
-    <div className="flex h-[calc(100dvh-8rem)] min-h-[520px] overflow-hidden rounded-[var(--radius-card)] border border-line bg-bg lg:h-[calc(100dvh-10rem)]">
+    <div className="flex min-h-0 flex-1 overflow-hidden rounded-[var(--radius-card)] border border-line bg-bg">
       <aside className={cn('flex w-full flex-col border-r border-line md:w-[340px] md:shrink-0', activeId && 'hidden md:flex')}>
         <div className="space-y-3 border-b border-line p-3">
           <div className="flex items-center justify-between">
